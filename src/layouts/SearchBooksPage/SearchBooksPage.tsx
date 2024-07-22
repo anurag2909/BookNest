@@ -19,6 +19,9 @@ export const SearchBooksPage = () => {
   const [search, setSearch] = useState("");
   const [searchUrl, setSearchUrl] = useState("");
 
+  // For Category selection ============>>>>>>>>>
+  const [categorySelection, setCategorySelection] = useState("Book category");
+
   useEffect(() => {
     const fetchBooks = async () => {
       const baseurl = "http://localhost:8080/api/books";
@@ -26,7 +29,10 @@ export const SearchBooksPage = () => {
 
       if (searchUrl === "")
         url = baseurl + "?page=" + (currentPage - 1) + "&size=" + booksPerPage;
-      else url = baseurl + searchUrl;
+      else {
+        let searchWithPage = searchUrl.replace("<pageNumber>", (currentPage - 1).toString());
+        url = baseurl + searchWithPage;
+      }
 
       const response = await fetch(url);
 
@@ -63,7 +69,7 @@ export const SearchBooksPage = () => {
       setHttpError(error.message);
     });
 
-    window.scrollTo(0, 0); // Whenever state changes, the current page scrolls to the top
+    window.scrollTo(0, 0); // Whenever state changes, the current page scrolls up to the top
   }, [currentPage, searchUrl]);
 
   if (isLoading) {
@@ -79,12 +85,34 @@ export const SearchBooksPage = () => {
   }
 
   const searchHandleChange = () => {
+    setCurrentPage(1);
+
     if (search === "") setSearchUrl("");
     else
       setSearchUrl(
         "/search/findByTitleContaining?title=" +
           search +
-          "&page=0&size=" +
+          "&page=<pageNumber>&size=" +
+          booksPerPage
+      );
+  };
+
+  const categoryHandler = (value: string) => {
+    setCurrentPage(1);
+    value = value.toLowerCase();
+
+    if (value === "fe") setCategorySelection("Front-End");
+    else if (value === "be") setCategorySelection("Back-End");
+    else if (value === "data") setCategorySelection("Data");
+    else if (value === "devops") setCategorySelection("DevOps");
+    else setCategorySelection("All");
+
+    if (value === "all") setSearchUrl("?page=<pageNumber>&size=" + booksPerPage);
+    else
+      setSearchUrl(
+        "/search/findByCategory?category=" +
+          value +
+          "&page=<pageNumber>&size=" +
           booksPerPage
       );
   };
@@ -129,33 +157,33 @@ export const SearchBooksPage = () => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  Category
+                  {categorySelection}
                 </button>
                 <ul
                   className="dropdown-menu"
                   aria-labelledby="dropdownMenuButton1"
                 >
-                  <li>
+                  <li onClick={() => categoryHandler("All")}>
                     <a className="dropdown-item" href="#">
                       All
                     </a>
                   </li>
-                  <li>
+                  <li onClick={() => categoryHandler("FE")}>
                     <a className="dropdown-item" href="#">
-                      Front End
+                      Front-End
                     </a>
                   </li>
-                  <li>
+                  <li onClick={() => categoryHandler("BE")}>
                     <a className="dropdown-item" href="#">
-                      Back End
+                      Back-End
                     </a>
                   </li>
-                  <li>
+                  <li onClick={() => categoryHandler("Data")}>
                     <a className="dropdown-item" href="#">
                       Data
                     </a>
                   </li>
-                  <li>
+                  <li onClick={() => categoryHandler("DevOps")}>
                     <a className="dropdown-item" href="#">
                       DevOps
                     </a>
@@ -202,3 +230,5 @@ export const SearchBooksPage = () => {
     </div>
   );
 };
+
+
