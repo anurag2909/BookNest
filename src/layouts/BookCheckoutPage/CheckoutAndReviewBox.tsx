@@ -29,11 +29,11 @@ export const CheckoutAndReviewBox: React.FC<{
           <div className="row">
             <p className="col-6 lead">
               <b>{props.book?.copies} </b>
-               copies
+              copies
             </p>
             <p className="col-6 lead">
               <b>{props.book?.copiesAvailable} </b>
-               available
+              available
             </p>
           </div>
         </div>
